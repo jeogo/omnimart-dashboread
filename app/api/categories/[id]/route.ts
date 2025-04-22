@@ -1,23 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { 
-  getCategoryById, 
-  updateCategory, 
-  deleteCategory 
+import {
+  getCategoryById,
+  updateCategory,
+  deleteCategory
 } from '@/models/Category';
 import mongoose from 'mongoose';
 
+// Helper function to extract ID from the URL
+const extractIdFromUrl = (request: NextRequest): string => {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split('/');
+  return pathParts[pathParts.length - 1];
+};
+
 // Get a specific category by ID
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const id = params?.id;
+    const id = extractIdFromUrl(request);
     
     if (!id) {
       return NextResponse.json(
-        { error: 'معرف الفئة مطلوب' }, 
+        { error: 'معرف الفئة مطلوب' },
         { status: 400 }
       );
     }
@@ -27,7 +31,7 @@ export async function GET(
     
     if (!category) {
       return NextResponse.json(
-        { error: 'لم يتم العثور على الفئة' }, 
+        { error: 'لم يتم العثور على الفئة' },
         { status: 404 }
       );
     }
@@ -43,23 +47,20 @@ export async function GET(
 }
 
 // Update a category by ID
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
-    const id = params?.id;
+    const id = extractIdFromUrl(request);
     
     if (!id) {
       return NextResponse.json(
-        { error: 'معرف الفئة مطلوب' }, 
+        { error: 'معرف الفئة مطلوب' },
         { status: 400 }
       );
     }
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { error: 'معرف الفئة غير صالح' }, 
+        { error: 'معرف الفئة غير صالح' },
         { status: 400 }
       );
     }
@@ -85,7 +86,7 @@ export async function PUT(
     if (!updatedCategory) {
       console.log(`Update failed - no category found with ID: ${id}`);
       return NextResponse.json(
-        { error: 'لم يتم العثور على الفئة' }, 
+        { error: 'لم يتم العثور على الفئة' },
         { status: 404 }
       );
     }
@@ -95,26 +96,23 @@ export async function PUT(
   } catch (error: any) {
     console.error(`Error updating category:`, error);
     return NextResponse.json(
-      { 
+      {
         error: 'فشل في تحديث الفئة',
         details: error.message || 'خطأ غير معروف'
-      }, 
+      },
       { status: 500 }
     );
   }
 }
 
 // Delete a category by ID
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
-    const id = params?.id;
+    const id = extractIdFromUrl(request);
     
     if (!id) {
       return NextResponse.json(
-        { error: 'معرف الفئة مطلوب' }, 
+        { error: 'معرف الفئة مطلوب' },
         { status: 400 }
       );
     }
@@ -124,7 +122,7 @@ export async function DELETE(
     
     if (!success) {
       return NextResponse.json(
-        { error: 'لم يتم العثور على الفئة' }, 
+        { error: 'لم يتم العثور على الفئة' },
         { status: 404 }
       );
     }
@@ -133,7 +131,7 @@ export async function DELETE(
   } catch (error) {
     console.error(`Error deleting category:`, error);
     return NextResponse.json(
-      { error: 'فشل في حذف الفئة' }, 
+      { error: 'فشل في حذف الفئة' },
       { status: 500 }
     );
   }

@@ -5,11 +5,11 @@ import { getProductById, updateProduct, deleteProduct } from '@/models/Product';
 // Get a specific product by ID
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the ID first before using it
-    const id = params?.id;
+    const { id } = await params;
     
     // Validate ID
     if (!id) {
@@ -43,11 +43,11 @@ export async function GET(
 // Update a product by ID
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Extract and validate ID first
-    const id = params?.id;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
@@ -91,11 +91,10 @@ export async function PUT(
 // Delete a product by ID
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }) {
   try {
     // Extract and validate ID first
-    const id = params?.id;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(

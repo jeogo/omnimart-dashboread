@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { 
   getOrderById, 
@@ -9,50 +9,38 @@ import {
 
 // Get a specific order by ID
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json({ error: 'معرف الطلب مطلوب' }, { status: 400 });
+  }
+
   try {
-    // Get the ID first before using it
-    const id = params?.id;
-    
-    // Validate ID
-    if (!id) {
-      return NextResponse.json(
-        { error: 'معرف الطلب مطلوب' }, 
-        { status: 400 }
-      );
-    }
-    
-    // Connect to database and get order
     await connectToDatabase();
     const order = await getOrderById(id);
-    
+
     if (!order) {
-      return NextResponse.json(
-        { error: 'لم يتم العثور على الطلب' }, 
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'لم يتم العثور على الطلب' }, { status: 404 });
     }
-    
+
     return NextResponse.json({ order });
   } catch (error) {
     console.error(`Error fetching order:`, error);
-    return NextResponse.json(
-      { error: 'فشل في جلب بيانات الطلب' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'فشل في جلب بيانات الطلب' }, { status: 500 });
   }
 }
 
 // Update an order by ID
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Extract and validate ID first
-    const id = params?.id;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
@@ -113,11 +101,11 @@ export async function PUT(
 // Delete an order by ID
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Extract and validate ID first
-    const id = params?.id;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
