@@ -1,0 +1,131 @@
+// واجهات البيانات الخاصة بالـ Products، Orders، Categories، Discounts
+
+export interface Product {
+    id: string;                  // معرّف المنتج
+    name: string;                // اسم المنتج
+    description: string;         // وصف المنتج
+    price: number;               // السعر
+    oldPrice?: number;           // السعر القديم قبل التخفيض (اختياري)
+    categoryId: string;          // فئة المنتج
+    category?: string;           // اسم الفئة للعرض
+    images: string[];            // صور المنتج
+    image?: string;              // الصورة الرئيسية للمنتج (للتوافق مع الكود القديم)
+    features: string[];          // ميزات المنتج
+    material: string;            // المواد المصنوع منها المنتج
+    care: string;                // تعليمات العناية بالمنتج
+    sizes: string[];             // المقاسات المتوفرة
+    colors?: { name: string; value: string }[]; // الألوان المتوفرة
+    isNew?: boolean;             // ما إذا كان المنتج جديد
+    discount?: number | {        // نسبة التخفيض أو كائن تفاصيل التخفيض
+      percentage: number;
+      startDate: string;
+      endDate: string;
+      type: 'sale' | 'special';
+    };
+    rating: number;              // تقييم المنتج
+    reviews: number;             // عدد المراجعات
+    createdAt: Date;             // تاريخ إضافة المنتج
+    updatedAt: Date;             // تاريخ آخر تعديل
+    discountId?: string;         // معرّف التخفيض (إن وُجد)
+}
+  
+export interface Order {
+    id: string;                  // معرّف الطلب
+    customerName: string;        // اسم العميل
+    customerPhone: string;       // رقم الهاتف
+    customerAddress: string;     // عنوان العميل
+    wilaya: string;              // الولاية
+    products: Array<{
+      productId: string;
+      productName: string;       // اسم المنتج
+      price: number;             // سعر المنتج
+      quantity: number;          // الكمية
+      size?: string;             // المقاس (اختياري)
+      color?: string;            // اللون (اختياري)
+    }>;
+    totalAmount: number;         // المبلغ الإجمالي للطلب
+    shippingCost: number;        // تكلفة الشحن
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'; // حالة الطلب بمزيد من التفاصيل
+    notes?: string;              // ملاحظات إضافية
+    createdAt: Date;             // تاريخ إنشاء الطلب
+    updatedAt?: Date;            // تاريخ آخر تحديث للطلب
+}
+  
+export interface Category {
+    id: string;                  // معرّف الفئة
+    name: string;                // اسم الفئة
+    description?: string;        // وصف الفئة (اختياري)
+    slug?: string;               // اسم URL المختصر للفئة
+    image?: string;              // صورة الفئة
+    parentId?: string;           // معرّف الفئة الأم (للفئات الفرعية)
+    isActive?: boolean;          // ما إذا كانت الفئة نشطة
+}
+  
+export interface Discount {
+    id: string;                  // معرّف التخفيض
+    name: string;                // اسم التخفيض
+    percentage: number;          // نسبة التخفيض
+    validFrom: Date;             // بداية صلاحية التخفيض
+    validTo: Date;               // نهاية صلاحية التخفيض
+    type?: 'sale' | 'special' | 'seasonal'; // نوع التخفيض
+    applicableProducts?: string[]; // معرّفات المنتجات المطبق عليها التخفيض
+    applicableCategories?: string[]; // معرّفات الفئات المطبق عليها التخفيض
+    minPurchase?: number;        // الحد الأدنى للشراء لتطبيق التخفيض
+    code?: string;               // رمز التخفيض (للخصومات بالرمز)
+    isActive?: boolean;          // ما إذا كان التخفيض نشط
+}
+
+// واجهات للإحصاءات
+export interface Statistics {
+    totalSales: number;          // إجمالي المبيعات
+    totalOrders: number;         // إجمالي الطلبات
+    totalCustomers: number;      // إجمالي العملاء
+    topSellingProducts: TopSellingProduct[]; // المنتجات الأكثر مبيعاً
+    recentOrders: Order[];       // الطلبات الأخيرة
+    salesByDate: SalesByDate[];  // المبيعات حسب التاريخ
+}
+
+export interface TopSellingProduct {
+    productId: string;           // معرّف المنتج
+    productName: string;         // اسم المنتج
+    unitsSold: number;           // عدد الوحدات المباعة
+    totalRevenue: number;        // إجمالي الإيرادات
+}
+
+export interface SalesByDate {
+    date: string;                // التاريخ
+    amount: number;              // المبلغ
+}
+
+// واجهة المستخدم (للمسؤولين)
+export interface User {
+    id: string;                  // معرّف المستخدم
+    username: string;            // اسم المستخدم
+    email: string;               // البريد الإلكتروني
+    password: string;            // كلمة المرور (مشفرة)
+    role: 'admin' | 'editor' | 'viewer'; // دور المستخدم
+    createdAt: Date;             // تاريخ إنشاء الحساب
+    lastLogin?: Date;            // تاريخ آخر تسجيل دخول
+}
+
+// إعدادات المتجر
+export interface StoreSettings {
+    storeName: string;           // اسم المتجر
+    logo: string;                // شعار المتجر
+    contactPhone: string;        // رقم الهاتف للتواصل
+    contactEmail: string;        // البريد الإلكتروني للتواصل
+    address: string;             // عنوان المتجر
+    socialMedia: {               // روابط وسائل التواصل الاجتماعي
+        facebook?: string;
+        instagram?: string;
+        twitter?: string;
+    };
+    shippingRates: ShippingRate[]; // أسعار الشحن حسب المنطقة
+    workingHours: string;        // ساعات العمل
+}
+
+export interface ShippingRate {
+    region: string;              // المنطقة
+    cost: number;                // تكلفة الشحن
+    estimatedDays: string;       // المدة المتوقعة للتوصيل
+}

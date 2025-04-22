@@ -1,26 +1,167 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f9fc;
+  --foreground: #334155;
+  --card-bg: #ffffff;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --border: #e2e8f0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-main: var(--font-cairo);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #111827;
+    --foreground: #f1f5f9;
+    --card-bg: #1e293b;
+    --border: #334155;
   }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-main, sans-serif);
+  direction: rtl;
+}
+
+/* دعم RTL */
+.rtl-flip {
+  transform: scaleX(-1);
+}
+
+.dir-ltr {
+  direction: ltr;
+}
+
+/* تحسينات للتباعد والترتيب */
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all hover:shadow-md border border-gray-100 dark:border-gray-700;
+}
+
+.dashboard-stats-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5;
+}
+
+.data-table {
+  @apply w-full divide-y divide-gray-200 dark:divide-gray-700 rounded-lg overflow-hidden;
+}
+
+.data-table thead {
+  @apply bg-gray-50 dark:bg-gray-700;
+}
+
+.data-table th {
+  @apply px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.data-table tbody {
+  @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.data-table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100;
+}
+
+.status-badge {
+  @apply px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full;
+}
+
+.status-pending {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100;
+}
+
+.status-completed {
+  @apply bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100;
+}
+
+.status-cancelled {
+  @apply bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100;
+}
+
+/* تحسينات لعناصر لوحة التحكم */
+.dashboard-title {
+  @apply text-2xl font-bold mb-6 text-gray-800 dark:text-white;
+}
+
+.dashboard-section {
+  @apply mb-8;
+}
+
+.dashboard-section-title {
+  @apply text-xl font-semibold mb-4 text-gray-800 dark:text-white;
+}
+
+/* تحسينات الإضافية للتصميم المتجاوب */
+@layer utilities {
+  .sidebar-expanded\:right-16 {
+    @media (min-width: 768px) {
+      .sidebar-collapsed & {
+        right: 4rem !important;
+      }
+    }
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* تحسينات إضافية للقوائم والبطاقات */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .skeleton-pulse {
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* تحسينات استجابة للموبايل */
+@media (max-width: 640px) {
+  .dashboard-stats-grid {
+    gap: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
 }
