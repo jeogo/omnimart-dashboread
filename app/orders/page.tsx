@@ -7,6 +7,7 @@ import Modal from '@/components/ui/Modal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import OrderTable from '@/components/orders/OrderTable';
 import OrderDetails from '@/components/orders/OrderDetails';
+import {apiUtils} from '@/utils/apiUtils';
 
 export default function Orders() {
   // State
@@ -25,28 +26,15 @@ export default function Orders() {
     const fetchOrders = async () => {
       setLoading(true);
       setError(null);
-      
       try {
-        const url = statusFilter 
-          ? `/api/orders?status=${statusFilter}` 
-          : '/api/orders';
-          
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          throw new Error('فشل في جلب الطلبات');
-        }
-        
-        const data = await response.json();
-        setOrders(data.orders || []);
+        const data = await apiUtils.getAllOrders();
+        setOrders(data);
       } catch (err) {
-        console.error('Error fetching orders:', err);
         setError(err instanceof Error ? err.message : 'حدث خطأ أثناء جلب البيانات');
       } finally {
         setLoading(false);
       }
     };
-    
     fetchOrders();
   }, [statusFilter]);
 
@@ -55,7 +43,7 @@ export default function Orders() {
     searchTerm ? (
       order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerPhone.includes(searchTerm) ||
-      order.id.includes(searchTerm)
+      (order.id && order.id.includes(searchTerm))
     ) : true
   );
 
@@ -74,36 +62,17 @@ export default function Orders() {
   // Update order status
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      console.log(`Changing order ${orderId} status to: ${newStatus}`);
-      
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
-      
-      const responseData = await response.json();
-      
-      if (!response.ok) {
-        console.error('API error response:', responseData);
-        throw new Error(responseData.error || 'فشل في تحديث حالة الطلب');
-      }
-      
-      console.log('API success response:', responseData);
-      
-      // Update order in state
+      const responseData = await apiUtils.updateOrderStatus(orderId, newStatus);
       setOrders(prevOrders =>
         prevOrders.map(o =>
-          o.id === responseData.order.id ? responseData.order : o
+          o.id === responseData.id ? responseData : o
         )
       );
-      
       // If the current order is open in details modal, update it
-      if (currentOrder && currentOrder.id === responseData.order.id) {
-        setCurrentOrder(responseData.order);
+      if (currentOrder && currentOrder.id === responseData.id) {
+        setCurrentOrder(responseData);
       }
     } catch (err) {
-      console.error('Error updating order status:', err);
       setError(err instanceof Error ? err.message : 'فشل في تحديث حالة الطلب');
     }
   };
@@ -111,28 +80,16 @@ export default function Orders() {
   // Confirm order deletion
   const handleConfirmDelete = async () => {
     if (!currentOrder) return;
-    
     setIsDeleting(true);
     setError(null);
-    
     try {
-      const response = await fetch(`/api/orders/${currentOrder.id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في حذف الطلب');
-      }
-      
+      await apiUtils.deleteOrder(currentOrder.id || currentOrder._id || '');
       // Remove order from state
       setOrders(prevOrders =>
         prevOrders.filter(o => o.id !== currentOrder.id)
       );
-      
       setIsConfirmDeleteModalOpen(false);
     } catch (err) {
-      console.error('Error deleting order:', err);
       setError(err instanceof Error ? err.message : 'فشل في حذف الطلب');
     } finally {
       setIsDeleting(false);
@@ -247,12 +204,12 @@ export default function Orders() {
         <Modal
           isOpen={isDetailsModalOpen}
           onClose={() => setIsDetailsModalOpen(false)}
-          title={`تفاصيل الطلب #${currentOrder.id.substring(0, 8)}`}
+          title={`تفاصيل الطلب #${currentOrder.id ? currentOrder.id.substring(0, 8) : 'N/A'}`}
           size="lg"
         >
           <OrderDetails 
             order={currentOrder} 
-            onStatusChange={(status) => handleStatusChange(currentOrder.id, status)}
+            onStatusChange={(status) => currentOrder.id && handleStatusChange(currentOrder.id, status)}
           />
         </Modal>
       )}
@@ -292,7 +249,7 @@ export default function Orders() {
               هل أنت متأكد من حذف هذا الطلب؟
             </h3>
             <p className="mt-2 text-gray-500 dark:text-gray-400">
-              سيتم حذف الطلب <span className="font-semibold text-gray-700 dark:text-gray-300">#{currentOrder.id.substring(0, 8)}</span> نهائيًا.
+              سيتم حذف الطلب <span className="font-semibold text-gray-700 dark:text-gray-300">#{currentOrder.id ? currentOrder.id.substring(0, 8) : 'N/A'}</span> نهائيًا.
               <br />
               هذا الإجراء لا يمكن التراجع عنه.
             </p>

@@ -68,10 +68,10 @@ const OrderTable: React.FC<OrderTableProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">رقم الطلب:</span>
-                  <span className="text-blue-600 dark:text-blue-400 font-medium">#{order.id.substring(0, 8)}</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-medium">#{order.id?.substring(0, 8) ?? ''}</span>
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 dir-ltr text-right">
-                  {formatDate(order.createdAt)}
+                  {formatDate(order.createdAt ?? '')}
                 </div>
               </div>
               <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[order.status]?.class || statusConfig.pending.class}`}>
@@ -123,7 +123,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
               <select
                 id={`status-${order.id}`}
                 value={order.status}
-                onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                onChange={(e) => handleStatusChange(order.id ?? '', e.target.value as string)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
               >
                 <option value="pending">قيد الانتظار</option>

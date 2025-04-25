@@ -16,19 +16,16 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   onDelete 
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {categories.map((category) => (
-        <div key={category.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+        <div key={category.id || category._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow flex flex-col">
           {/* Header with image */}
           <div className="aspect-video relative overflow-hidden bg-gray-100 dark:bg-gray-700">
             {category.image ? (
-              <Image
+              <img
                 src={category.image}
                 alt={category.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                style={{ objectFit: 'cover' }}
-                className="hover:scale-110 transition-transform duration-300"
+                className="object-cover w-full h-full"
               />
             ) : (
               <div className="flex items-center justify-center h-full w-full bg-gray-200 dark:bg-gray-700">
@@ -37,8 +34,6 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                 </svg>
               </div>
             )}
-            
-            {/* Status badge */}
             <div className="absolute top-2 right-2">
               <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                 category.isActive !== false 
@@ -49,28 +44,19 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               </span>
             </div>
           </div>
-          
-          {/* Content */}
-          <div className="p-4">
+          <div className="flex-1 flex flex-col p-4">
             <div className="mb-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {category.name}
               </h3>
-              {category.slug && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  /{category.slug}
-                </p>
-              )}
+          
             </div>
-            
             {category.description && (
               <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4 h-10" title={category.description}>
                 {category.description}
               </p>
             )}
-            
-            {/* Actions */}
-            <div className="flex justify-end space-x-2 space-x-reverse mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex justify-end gap-2 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
               <button
                 onClick={() => onEdit(category)}
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 px-3 py-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900 dark:hover:bg-opacity-20 transition-colors"

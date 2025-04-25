@@ -1,0 +1,534 @@
+Starting API Endpoint Tests
+==============================
+✅ Created initial category with ID: 680bbb4f7465b16fb90f2dde for product tests
+✅ Created initial product with ID: 680bbb4f7465b16fb90f2de0 for order tests
+
+=== Endpoint: /api/products ===
+Description: Products endpoint. Supports CRUD operations for products. Each product belongs to a category and may have a discount.
+Methods:
+  - GET /api/products (get all)
+  - GET /api/products/:id (get by id)
+  - POST /api/products (create)
+  - PUT /api/products/:id (update)
+  - DELETE /api/products/:id (delete)
+
+-----Testing products CRUD operations-----
+POST products - Creating new product
+✅ Created product with ID: 680bbb4f7465b16fb90f2de2
+Response Status: 201
+Response JSON: {
+  "name": "Test Product",
+  "description": "A test product",
+  "price": 19.99,
+  "category": "680bbb4f7465b16fb90f2dde",
+  "stock": 10,
+  "imageUrl": "test-image.jpg",
+  "_id": "680bbb4f7465b16fb90f2de2",
+  "createdAt": "2025-04-25T16:41:51.458Z",
+  "updatedAt": "2025-04-25T16:41:51.458Z",
+  "__v": 0
+}
+GET products - Getting all products
+✅ Retrieved 6 products
+Response Status: 200
+Response JSON: [
+  {
+    "_id": "6808f7ddc77be29937a03dbd",
+    "name": "فستان أنيق",
+    "description": "فستان نسائي أنيق مناسب للمناسبات",
+    "price": 4500,
+    "oldPrice": 5000,
+    "categoryId": "6808f7dcc77be29937a03db3",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "تصميم عصري",
+      "قماش مريح"
+    ],
+    "material": "حرير وقطن",
+    "care": "تنظيف جاف فقط",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أحمر",
+        "value": "#FF0000"
+      },
+      {
+        "name": "أسود",
+        "value": "#000000"
+      }
+    ],
+    "isNewProduct": false,
+    "rating": 5,
+    "reviews": 8,
+    "discountId": "6808f7dcc77be29937a03db8",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:25:09.254Z",
+    "__v": 0,
+    "stock": 0
+  },
+  {
+    "_id": "6808f7ddc77be29937a03dbe",
+    "name": "حقيبة يد نسائية",
+    "description": "حقيبة يد عصرية وأنيقة",
+    "price": 3500,
+    "categoryId": "6808f7dcc77be29937a03db4",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "سعة كبيرة",
+      "متينة وعملية"
+    ],
+    "material": "جلد صناعي",
+    "care": "تنظيف بقطعة قماش مبللة",
+    "sizes": [
+      "واحد"
+    ],
+    "colors": [
+      {
+        "name": "بني",
+        "value": "#8B4513"
+      }
+    ],
+    "isNewProduct": true,
+    "rating": 4,
+    "reviews": 5,
+    "discountId": "6808f7dcc77be29937a03db9",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:58:15.507Z",
+    "__v": 0,
+    "stock": 0
+  },
+  {
+    "stock": 0,
+    "_id": "6808f7ddc77be29937a03dbc",
+    "name": "قميص كلاسيكي أزرق",
+    "description": "قميص رجالي كلاسيكي باللون الأزرق",
+    "price": 2500,
+    "categoryId": "6808f7dcc77be29937a03db2",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "خامة قطنية",
+      "مريح للاستخدام اليومي"
+    ],
+    "material": "قطن 100%",
+    "care": "غسيل بماء بارد",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      {
+        "name": "أزرق",
+        "value": "#0000FF"
+      }
+    ],
+    "isNewProduct": true,
+    "rating": 4.5,
+    "reviews": 12,
+    "discountId": null,
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-23T14:23:25.022Z",
+    "__v": 0
+  },
+  {
+    "_id": "6809fed15ec23bcea5a2b574",
+    "name": "ساعة رجالية ROLEX",
+    "description": "🔥 كميات محدودة، فلا تفوت هذه الفرصة!\n💎 قطع فاخرة تحمل معاني عميقة. 💎\n🌟 جودة مثالية وتصميم أنيق يعكس ذوقك الرفيع. 🌟\n🛒 هدايا مثالية بأفضل الأسعار، خدمة عملاء استثنائية. 🛒\n🚀 توصيل سريع إلى 58 ولاية في وقت قياسي. 🚀\n📩 اطلب الآن واستمتع بتجربة تسوق سلسة. 📩\n#تسوق_بثقة #جودة_عالية #توصيل_سريع #OmniMart #هدايا_فاخرة #ذكريات_لا_تنسى #خدمة_عملاء_متميزة #تسوق_أونلاين #اهدي_بحب #قصة_حب #اكسسوارات_راقية",
+    "price": 1250,
+    "oldPrice": 2600,
+    "categoryId": "680811421c0c35d6d3f6f6ce",
+    "images": [
+      "https://i.imgur.com/HBZ28CG.jpeg"
+    ],
+    "features": [],
+    "material": "",
+    "care": "",
+    "sizes": [
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أسود",
+        "value": "#000000"
+      },
+      {
+        "name": "أبيض",
+        "value": "#FFFFFF"
+      }
+    ],
+    "isNewProduct": true,
+    "rating": 0,
+    "reviews": 0,
+    "discountId": null,
+    "createdAt": "2025-04-24T09:05:21.151Z",
+    "updatedAt": "2025-04-25T15:50:11.394Z",
+    "__v": 0,
+    "stock": 0
+  },
+  {
+    "_id": "680bbb4f7465b16fb90f2de0",
+    "name": "Test Product",
+    "description": "A test product",
+    "price": 19.99,
+    "category": {
+      "_id": "680bbb4f7465b16fb90f2dde",
+      "name": "Test Category",
+      "description": "A test category",
+      "__v": 0
+    },
+    "stock": 10,
+    "imageUrl": "test-image.jpg",
+    "createdAt": "2025-04-25T16:41:51.365Z",
+    "updatedAt": "2025-04-25T16:41:51.365Z",
+    "__v": 0
+  },
+  {
+    "_id": "680bbb4f7465b16fb90f2de2",
+    "name": "Test Product",
+    "description": "A test product",
+    "price": 19.99,
+    "category": {
+      "_id": "680bbb4f7465b16fb90f2dde",
+      "name": "Test Category",
+      "description": "A test category",
+      "__v": 0
+    },
+    "stock": 10,
+    "imageUrl": "test-image.jpg",
+    "createdAt": "2025-04-25T16:41:51.458Z",
+    "updatedAt": "2025-04-25T16:41:51.458Z",
+    "__v": 0
+  }
+]
+GET products/680bbb4f7465b16fb90f2de2 - Getting single product
+✅ Retrieved product
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb4f7465b16fb90f2de2",
+  "name": "Test Product",
+  "description": "A test product",
+  "price": 19.99,
+  "category": {
+    "_id": "680bbb4f7465b16fb90f2dde",
+    "name": "Test Category",
+    "description": "A test category",
+    "__v": 0
+  },
+  "stock": 10,
+  "imageUrl": "test-image.jpg",
+  "createdAt": "2025-04-25T16:41:51.458Z",
+  "updatedAt": "2025-04-25T16:41:51.458Z",
+  "__v": 0
+}
+PUT products/680bbb4f7465b16fb90f2de2 - Updating product
+✅ Updated product
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb4f7465b16fb90f2de2",
+  "name": "Updated Test Product",
+  "description": "A test product",
+  "price": 19.99,
+  "category": "680bbb4f7465b16fb90f2dde",
+  "stock": 10,
+  "imageUrl": "test-image.jpg",
+  "createdAt": "2025-04-25T16:41:51.458Z",
+  "updatedAt": "2025-04-25T16:41:51.876Z",
+  "__v": 0
+}
+DELETE products/680bbb4f7465b16fb90f2de2 - Deleting product
+✅ Deleted product
+Response Status: 200
+Response JSON: {
+  "message": "Product deleted"
+}
+
+=== Endpoint: /api/categories ===
+Description: Categories endpoint. Supports CRUD operations for product categories.
+Methods:
+  - GET /api/categories (get all)
+  - GET /api/categories/:id (get by id)
+  - POST /api/categories (create)
+  - PUT /api/categories/:id (update)
+  - DELETE /api/categories/:id (delete)
+
+-----Testing categories CRUD operations-----
+✅ Categories operations tested during initialization
+
+=== Endpoint: /api/orders ===
+Description: Orders endpoint. Supports CRUD operations for customer orders. Each order contains customer info and a list of products.
+Methods:
+  - GET /api/orders (get all)
+  - GET /api/orders/:id (get by id)
+  - POST /api/orders (create)
+  - PUT /api/orders/:id (update)
+  - DELETE /api/orders/:id (delete)
+
+-----Testing orders CRUD operations-----
+POST orders - Creating new order
+✅ Created order with ID: 680bbb507465b16fb90f2dea
+Response Status: 201
+Response JSON: {
+  "customerName": "Test Customer",
+  "customerPhone": "1234567890",
+  "wilaya": "Test City",
+  "baladia": "Test Baladia",
+  "products": [
+    {
+      "product": "680bbb4f7465b16fb90f2de0",
+      "productName": "Test Product",
+      "price": 19.99,
+      "quantity": 2,
+      "_id": "680bbb507465b16fb90f2deb"
+    }
+  ],
+  "totalAmount": 39.98,
+  "shippingCost": 5,
+  "status": "pending",
+  "_id": "680bbb507465b16fb90f2dea",
+  "createdAt": "2025-04-25T16:41:52.056Z",
+  "updatedAt": "2025-04-25T16:41:52.056Z",
+  "__v": 0
+}
+GET orders - Getting all orders
+✅ Retrieved 2 orders
+Response Status: 200
+Response JSON: [
+  {
+    "_id": "680bb99f88672233f407a406",
+    "customerName": "Test Customer",
+    "customerPhone": "1234567890",
+    "customerAddress": "Test Address, Street 123",
+    "wilaya": "Test City",
+    "products": [
+      {
+        "product": null,
+        "productName": "Test Product",
+        "price": 19.99,
+        "quantity": 2,
+        "_id": "680bb99f88672233f407a407"
+      }
+    ],
+    "totalAmount": 39.98,
+    "shippingCost": 5,
+    "status": "pending",
+    "createdAt": "2025-04-25T16:34:39.307Z",
+    "updatedAt": "2025-04-25T16:34:39.307Z",
+    "__v": 0
+  },
+  {
+    "_id": "680bbb507465b16fb90f2dea",
+    "customerName": "Test Customer",
+    "customerPhone": "1234567890",
+    "wilaya": "Test City",
+    "baladia": "Test Baladia",
+    "products": [
+      {
+        "product": {
+          "_id": "680bbb4f7465b16fb90f2de0",
+          "name": "Test Product",
+          "description": "A test product",
+          "price": 19.99,
+          "category": "680bbb4f7465b16fb90f2dde",
+          "stock": 10,
+          "imageUrl": "test-image.jpg",
+          "createdAt": "2025-04-25T16:41:51.365Z",
+          "updatedAt": "2025-04-25T16:41:51.365Z",
+          "__v": 0
+        },
+        "productName": "Test Product",
+        "price": 19.99,
+        "quantity": 2,
+        "_id": "680bbb507465b16fb90f2deb"
+      }
+    ],
+    "totalAmount": 39.98,
+    "shippingCost": 5,
+    "status": "pending",
+    "createdAt": "2025-04-25T16:41:52.056Z",
+    "updatedAt": "2025-04-25T16:41:52.056Z",
+    "__v": 0
+  }
+]
+GET orders/680bbb507465b16fb90f2dea - Getting single order
+✅ Retrieved order
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb507465b16fb90f2dea",
+  "customerName": "Test Customer",
+  "customerPhone": "1234567890",
+  "wilaya": "Test City",
+  "baladia": "Test Baladia",
+  "products": [
+    {
+      "product": {
+        "_id": "680bbb4f7465b16fb90f2de0",
+        "name": "Test Product",
+        "description": "A test product",
+        "price": 19.99,
+        "category": "680bbb4f7465b16fb90f2dde",
+        "stock": 10,
+        "imageUrl": "test-image.jpg",
+        "createdAt": "2025-04-25T16:41:51.365Z",
+        "updatedAt": "2025-04-25T16:41:51.365Z",
+        "__v": 0
+      },
+      "productName": "Test Product",
+      "price": 19.99,
+      "quantity": 2,
+      "_id": "680bbb507465b16fb90f2deb"
+    }
+  ],
+  "totalAmount": 39.98,
+  "shippingCost": 5,
+  "status": "pending",
+  "createdAt": "2025-04-25T16:41:52.056Z",
+  "updatedAt": "2025-04-25T16:41:52.056Z",
+  "__v": 0
+}
+PUT orders/680bbb507465b16fb90f2dea - Updating order
+✅ Updated order
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb507465b16fb90f2dea",
+  "customerName": "Test Customer",
+  "customerPhone": "1234567890",
+  "wilaya": "Test City",
+  "baladia": "Test Baladia",
+  "products": [
+    {
+      "product": "680bbb4f7465b16fb90f2de0",
+      "productName": "Test Product",
+      "price": 19.99,
+      "quantity": 2,
+      "_id": "680bbb507465b16fb90f2df4"
+    }
+  ],
+  "totalAmount": 39.98,
+  "shippingCost": 5,
+  "status": "processing",
+  "createdAt": "2025-04-25T16:41:52.056Z",
+  "updatedAt": "2025-04-25T16:41:52.462Z",
+  "__v": 0
+}
+DELETE orders/680bbb507465b16fb90f2dea - Deleting order
+✅ Deleted order
+Response Status: 200
+Response JSON: {
+  "message": "Order deleted"
+}
+
+=== Endpoint: /api/discounts ===
+Description: Discounts endpoint. Supports CRUD operations for discount codes and offers.
+Methods:
+  - GET /api/discounts (get all)
+  - GET /api/discounts/:id (get by id)
+  - POST /api/discounts (create)
+  - PUT /api/discounts/:id (update)
+  - DELETE /api/discounts/:id (delete)
+
+-----Testing discounts CRUD operations-----
+POST discounts - Creating new discount
+✅ Created discount with ID: 680bbb507465b16fb90f2df9
+Response Status: 201
+Response JSON: {
+  "code": "TEST10",
+  "percentage": 10,
+  "expiresAt": "2025-04-26T16:41:51.144Z",
+  "_id": "680bbb507465b16fb90f2df9",
+  "__v": 0
+}
+GET discounts - Getting all discounts
+✅ Retrieved 4 discounts
+Response Status: 200
+Response JSON: [
+  {
+    "_id": "68068a008d4bc68932f66dec",
+    "name": "خصم اول زيارة للموقع",
+    "percentage": 20,
+    "validFrom": "2025-04-21T00:00:00.000Z",
+    "validTo": "2025-05-21T00:00:00.000Z",
+    "type": "sale",
+    "applicableProducts": [],
+    "applicableCategories": [],
+    "isActive": true,
+    "createdAt": "2025-04-21T18:10:08.315Z",
+    "updatedAt": "2025-04-22T01:59:04.326Z",
+    "__v": 0
+  },
+  {
+    "_id": "6808f7dcc77be29937a03db8",
+    "name": "خصم الصيف",
+    "percentage": 15,
+    "validFrom": "2025-04-23T14:23:24.921Z",
+    "validTo": "2025-05-23T14:23:24.921Z",
+    "type": "seasonal",
+    "applicableProducts": [],
+    "applicableCategories": [],
+    "isActive": true,
+    "createdAt": "2025-04-23T14:23:24.923Z",
+    "updatedAt": "2025-04-23T14:23:24.923Z",
+    "__v": 0
+  },
+  {
+    "_id": "6808f7dcc77be29937a03db9",
+    "name": "عرض خاص",
+    "percentage": 25,
+    "validFrom": "2025-04-23T14:23:24.921Z",
+    "validTo": "2025-05-03T14:23:24.921Z",
+    "type": "special",
+    "applicableProducts": [],
+    "applicableCategories": [],
+    "isActive": true,
+    "createdAt": "2025-04-23T14:23:24.924Z",
+    "updatedAt": "2025-04-23T14:23:24.924Z",
+    "__v": 0
+  },
+  {
+    "_id": "680bbb507465b16fb90f2df9",
+    "code": "TEST10",
+    "percentage": 10,
+    "expiresAt": "2025-04-26T16:41:51.144Z",
+    "__v": 0
+  }
+]
+GET discounts/680bbb507465b16fb90f2df9 - Getting single discount
+✅ Retrieved discount
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb507465b16fb90f2df9",
+  "code": "TEST10",
+  "percentage": 10,
+  "expiresAt": "2025-04-26T16:41:51.144Z",
+  "__v": 0
+}
+PUT discounts/680bbb507465b16fb90f2df9 - Updating discount
+✅ Updated discount
+Response Status: 200
+Response JSON: {
+  "_id": "680bbb507465b16fb90f2df9",
+  "code": "TEST10",
+  "percentage": 15,
+  "expiresAt": "2025-04-26T16:41:51.144Z",
+  "__v": 0
+}
+DELETE discounts/680bbb507465b16fb90f2df9 - Deleting discount
+✅ Deleted discount
+Response Status: 200
+Response JSON: {
+  "message": "Discount deleted"
+}
+
+✅ Cleaned up initial product: 680bbb4f7465b16fb90f2de0
+
+✅ Cleaned up initial category: 680bbb4f7465b16fb90f2dde

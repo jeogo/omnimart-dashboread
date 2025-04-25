@@ -1,236 +1,92 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Discount } from '@/types';
+import { Discount, Product } from '@/types';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import DiscountForm from '@/components/discounts/DiscountForm';
+import DiscountTable from '@/components/discounts/DiscountTable';
+import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
+import { apiUtils } from '@/utils/apiUtils';
 
 export default function Discounts() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [activeOnly, setActiveOnly] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentDiscount, setCurrentDiscount] = useState<Discount | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<Omit<Discount, 'validFrom' | 'validTo'>> & {
-    validFrom?: string;
-    validTo?: string;
-  }>({
-    name: '',
-    percentage: 0,
-    validFrom: new Date().toISOString().split('T')[0],
-    validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  });
-  const [formErrors, setFormErrors] = useState<{
-    name?: string;
-    percentage?: string;
-    validFrom?: string;
-    validTo?: string;
-  }>({});
 
-  // Fetch discounts from API
   useEffect(() => {
-    const fetchDiscounts = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/discounts');
-        
-        if (!response.ok) {
-          throw new Error('فشل في جلب الخصومات');
-        }
-        
-        const data = await response.json();
-        setDiscounts(data.discounts || []);
+        const [discountsData, productsData] = await Promise.all([
+          apiUtils.getAllDiscounts(),
+          apiUtils.getAllProducts()
+        ]);
+        setDiscounts(discountsData);
+        setProducts(productsData);
       } catch (err) {
-        console.error('Error fetching discounts:', err);
         setError(err instanceof Error ? err.message : 'حدث خطأ أثناء جلب البيانات');
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchDiscounts();
+    fetchData();
   }, []);
 
-  // Add discount
-  const handleAddDiscount = () => {
-    setCurrentDiscount(null);
-    setForm({
-      name: '',
-      percentage: 0,
-      validFrom: new Date().toISOString().split('T')[0],
-      validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    });
-    setFormErrors({});
-    setIsAddModalOpen(true);
-  };
+  // Filter discounts based on search term, type and active status
+  const filteredDiscounts = discounts.filter(discount => {
+    const matchesSearch = searchTerm
+      ? (discount.name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (discount.code && discount.code.toLowerCase().includes(searchTerm.toLowerCase()))
+      : true;
+    const matchesType = typeFilter ? discount.type === typeFilter : true;
+    const matchesActive = activeOnly ? isDiscountActive(discount) : true;
+    return matchesSearch && matchesType && matchesActive;
+  });
 
-  // Edit discount
-  const handleEditDiscount = (discount: Discount) => {
-    setCurrentDiscount(discount);
-    setForm({
-      name: discount.name,
-      percentage: discount.percentage,
-      validFrom: new Date(discount.validFrom).toISOString().split('T')[0],
-      validTo: new Date(discount.validTo).toISOString().split('T')[0]
-    });
-    setFormErrors({});
-    setIsAddModalOpen(true);
-  };
-
-  // Delete discount (show confirmation)
-  const handleDeleteClick = (discount: Discount) => {
-    setCurrentDiscount(discount);
-    setIsDeleteModalOpen(true);
-  };
-
-  // Handle form input changes
-  const handleChange = (field: keyof Discount, value: any) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-    
-    if (formErrors[field as keyof typeof formErrors]) {
-      setFormErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  // Validate form
-  const validateForm = (): boolean => {
-    const errors: {
-      name?: string;
-      percentage?: string;
-      validFrom?: string;
-      validTo?: string;
-    } = {};
-    
-    if (!form.name?.trim()) {
-      errors.name = 'اسم الخصم مطلوب';
-    }
-    
-    if (!form.percentage || form.percentage <= 0 || form.percentage > 100) {
-      errors.percentage = 'يجب إدخال نسبة خصم صحيحة (بين 1 و 100)';
-    }
-    
-    if (!form.validFrom) {
-      errors.validFrom = 'تاريخ بداية الخصم مطلوب';
-    }
-    
-    if (!form.validTo) {
-      errors.validTo = 'تاريخ نهاية الخصم مطلوب';
-    } else if (form.validFrom && form.validTo && new Date(form.validFrom) > new Date(form.validTo)) {
-      errors.validTo = 'يجب أن يكون تاريخ النهاية بعد تاريخ البداية';
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Save discount (create or update)
-  const handleSaveDiscount = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    setError(null);
-    
-    try {
-      const isUpdate = !!currentDiscount?.id;
-      const url = '/api/discounts';
-      const method = isUpdate ? 'PUT' : 'POST';
-      const body = isUpdate 
-        ? JSON.stringify({ id: currentDiscount.id, ...form })
-        : JSON.stringify(form);
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في حفظ الخصم');
-      }
-      
-      const data = await response.json();
-      
-      if (isUpdate) {
-        // Update discount in state
-        setDiscounts(prevDiscounts =>
-          prevDiscounts.map(d =>
-            d.id === data.discount.id ? data.discount : d
-          )
-        );
-      } else {
-        // Add new discount to state
-        setDiscounts(prevDiscounts => [...prevDiscounts, data.discount]);
-      }
-      
-      setIsAddModalOpen(false);
-    } catch (err) {
-      console.error('Error saving discount:', err);
-      setError(err instanceof Error ? err.message : 'فشل في حفظ الخصم');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Confirm discount deletion
-  const handleConfirmDelete = async () => {
-    if (!currentDiscount) return;
-    
-    setIsDeleting(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/discounts?id=${currentDiscount.id}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في حذف الخصم');
-      }
-      
-      // Remove discount from state
-      setDiscounts(prevDiscounts =>
-        prevDiscounts.filter(d => d.id !== currentDiscount.id)
-      );
-      
-      setIsDeleteModalOpen(false);
-    } catch (err) {
-      console.error('Error deleting discount:', err);
-      setError(err instanceof Error ? err.message : 'فشل في حذف الخصم');
-    } finally {
-      setIsDeleting(false);
-    }
+  // Check if discount is active
+  const isDiscountActive = (discount: Discount): boolean => {
+    if (discount.isActive === false) return false;
+    const now = new Date();
+    return now >= new Date(discount.validFrom ?? '1970-01-01T00:00:00Z') &&
+           now <= new Date(discount.validTo ?? '1970-01-01T00:00:00Z');
   };
 
   // Get discount status
   const getDiscountStatus = (discount: Discount) => {
     const now = new Date();
-    const validFrom = new Date(discount.validFrom);
-    const validTo = new Date(discount.validTo);
+    const validFrom = new Date(discount.validFrom ?? 0);
+    const validTo = new Date(discount.validTo || '1970-01-01T00:00:00Z');
     
-    if (now < validFrom) {
+    if (discount.isActive === false) {
+      return { 
+        status: 'غير نشط', 
+        className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+      };
+    } else if (now < validFrom) {
       return { 
         status: 'قادم', 
         className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:bg-opacity-20 dark:text-blue-300' 
       };
     } else if (now > validTo) {
       return { 
-        status: 'منتهي',
-        className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:bg-opacity-50 dark:text-gray-300'
+        status: 'منتهي', 
+        className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:bg-opacity-20 dark:text-red-300' 
       };
     } else {
-      return {
-        status: 'نشط',
+      return { 
+        status: 'نشط', 
         className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:bg-opacity-20 dark:text-green-300'
       };
     }
@@ -245,272 +101,318 @@ export default function Discounts() {
     });
   };
 
-  // Discount card component
-  const DiscountCard = ({ discount }: { discount: Discount }) => {
-    const discountStatus = getDiscountStatus(discount);
-    
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300">
-        <div className="px-4 py-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
-          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${discountStatus.className}`}>
-            {discountStatus.status}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleEditDiscount(discount)}
-              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full dark:text-blue-400 dark:hover:bg-blue-900 dark:hover:bg-opacity-20"
-              title="تعديل"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-            </button>
-            <button
-              onClick={() => handleDeleteClick(discount)}
-              className="p-1.5 text-red-600 hover:bg-red-50 rounded-full dark:text-red-400 dark:hover:bg-red-900 dark:hover:bg-opacity-20"
-              title="حذف"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">{discount.name}</h3>
-          
-          <div className="flex justify-center mb-4">
-            <div className="bg-green-50 dark:bg-green-900 dark:bg-opacity-20 p-4 rounded-full w-24 h-24 flex items-center justify-center">
-              <span className="text-2xl font-extrabold text-green-600 dark:text-green-400">
-                -{discount.percentage}%
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex flex-col space-y-2 text-sm">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500 dark:text-gray-400">بداية الخصم:</span>
-              <span className="font-medium text-gray-800 dark:text-gray-200 dir-ltr">
-                {formatDate(discount.validFrom)}
-              </span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500 dark:text-gray-400">نهاية الخصم:</span>
-              <span className="font-medium text-gray-800 dark:text-gray-200 dir-ltr">
-                {formatDate(discount.validTo)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  // Calculate remaining days
+  const getRemainingDays = (date: Date | string): number => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = new Date(date);
+    endDate.setHours(0, 0, 0, 0);
+    const diffTime = endDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  // Handle discount functions
+  const handleAddDiscount = () => {
+    setCurrentDiscount(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditDiscount = (discount: Discount) => {
+    setCurrentDiscount(discount);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteDiscount = (discount: Discount) => {
+    setCurrentDiscount(discount);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Save discount (create or update)
+  const handleSaveDiscount = async (discountData: Partial<Discount>) => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      let responseData: Discount;
+      const isUpdate = !!discountData.id;
+      
+      if (isUpdate && discountData.id) {
+        responseData = await apiUtils.updateDiscount(discountData.id, discountData);
+      } else {
+        responseData = await apiUtils.createDiscount(discountData);
+      }
+      
+      if (isUpdate) {
+        setDiscounts(prevDiscounts =>
+          prevDiscounts.map(d => d.id === discountData.id ? responseData : d)
+        );
+      } else {
+        setDiscounts(prevDiscounts => [...prevDiscounts, responseData]);
+      }
+      
+      setIsModalOpen(false);
+      
+      // Show success notification
+      const notification = document.getElementById('notification');
+      if (notification) {
+        notification.textContent = isUpdate ? 'تم تحديث الخصم بنجاح' : 'تم إضافة الخصم بنجاح';
+        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-down';
+        setTimeout(() => {
+          notification.className = 'hidden';
+        }, 3000);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'فشل في حفظ الخصم');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Confirm discount deletion
+  const handleConfirmDelete = async () => {
+    if (!currentDiscount) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      if (currentDiscount.id || currentDiscount._id) {
+        if (currentDiscount.id) {
+          await apiUtils.deleteDiscount(currentDiscount.id);
+        } else if (currentDiscount._id) {
+          await apiUtils.deleteDiscount(currentDiscount._id);
+        } else {
+          throw new Error('Discount ID is undefined');
+        }
+      } else {
+        throw new Error('Discount ID is undefined');
+      }
+      setDiscounts(prevDiscounts =>
+        prevDiscounts.filter(d => d.id !== currentDiscount.id && d._id !== currentDiscount._id)
+      );
+      setIsDeleteModalOpen(false);
+      
+      // Show success notification
+      const notification = document.getElementById('notification');
+      if (notification) {
+        notification.textContent = 'تم حذف الخصم بنجاح';
+        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-down';
+        setTimeout(() => {
+          notification.className = 'hidden';
+        }, 3000);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'فشل في حذف الخصم');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Calculate affected products count for a discount
+  const getAffectedProductsCount = (discount: Discount): number => {
+    if (!discount.applicableProducts || discount.applicableProducts.length === 0) {
+      return products.length; // Global discount
+    }
+    return discount.applicableProducts.length;
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Header */}
+  
+      {/* Notification element */}
+      <div id="notification" className="hidden"></div>
+      
+      {/* Page header */}
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="dashboard-title">إدارة الخصومات</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">إدارة الخصومات</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            قم بإضافة وتعديل الخصومات لمنتجاتك
+            إضافة وتعديل وإدارة الخصومات والعروض
           </p>
         </div>
-        
         <Button 
           variant="primary" 
           onClick={handleAddDiscount}
-          className="shrink-0 w-full sm:w-auto"
+          className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5"
         >
-          <span className="flex items-center gap-2 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            <span>إضافة خصم جديد</span>
-          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>إضافة خصم جديد</span>
         </Button>
+      </div>
+      
+      {/* Filters */}
+      <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Search input */}
+          <div>
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              البحث في الخصومات
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="search"
+                className="block w-full pr-10 border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                placeholder="البحث بالإسم أو كود الخصم"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          {/* Type filter */}
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              نوع الخصم
+            </label>
+            <select
+              id="type"
+              className="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="">جميع الأنواع</option>
+              <option value="percentage">نسبة مئوية</option>
+              <option value="fixed">مبلغ ثابت</option>
+              <option value="sale">تخفيض</option>
+              <option value="seasonal">موسمي</option>
+              <option value="clearance">تصفية</option>
+            </select>
+          </div>
+          
+          {/* Active filter toggle */}
+          <div className="flex items-end">
+            <div className="relative flex items-center">
+              <input
+                id="active-only"
+                name="active-only"
+                type="checkbox"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                checked={activeOnly}
+                onChange={(e) => setActiveOnly(e.target.checked)}
+              />
+              <label htmlFor="active-only" className="mr-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                عرض الخصومات النشطة فقط
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        {/* Quick stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <div className="bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 p-3 rounded-lg">
+            <div className="text-xs text-blue-500 dark:text-blue-300 font-medium">إجمالي الخصومات</div>
+            <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">{discounts.length}</div>
+          </div>
+          <div className="bg-green-50 dark:bg-green-900 dark:bg-opacity-20 p-3 rounded-lg">
+            <div className="text-xs text-green-500 dark:text-green-300 font-medium">الخصومات النشطة</div>
+            <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">
+              {discounts.filter(d => isDiscountActive(d)).length}
+              {discounts.filter(d => isDiscountActive({
+                ...d,
+                validFrom: d.validFrom ?? '1970-01-01T00:00:00Z',
+                validTo: d.validTo ?? '1970-01-01T00:00:00Z'
+              })).length}
+          </div>
+          <div className="bg-orange-50 dark:bg-orange-900 dark:bg-opacity-20 p-3 rounded-lg">
+            <div className="text-xs text-orange-500 dark:text-orange-300 font-medium">الخصومات القادمة</div>
+            <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">
+              {discounts.filter(d => d.isActive !== false && new Date() < new Date(d.validFrom ?? '1970-01-01T00:00:00Z')).length}
+            </div>
+          </div>
+          <div className="bg-red-50 dark:bg-red-900 dark:bg-opacity-20 p-3 rounded-lg">
+            <div className="text-xs text-red-500 dark:text-red-300 font-medium">الخصومات المنتهية</div>
+            <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">
+              {discounts.filter(d => d.isActive !== false && new Date() > new Date(d.validTo ?? '1970-01-01T00:00:00Z')).length}
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Error message */}
       {error && (
-        <div className="mb-6 p-4 border border-red-300 bg-red-50 dark:bg-red-900 dark:bg-opacity-20 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300">
+        <div className="mb-6 p-4 flex items-start border border-red-300 bg-red-50 dark:bg-red-900 dark:bg-opacity-20 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <p>{error}</p>
         </div>
       )}
       
-      {/* Loading spinner or empty state or discounts grid */}
+      {/* Loading spinner or discounts display */}
       {loading ? (
         <div className="h-64 flex items-center justify-center">
           <LoadingSpinner size="lg" />
         </div>
-      ) : discounts.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+      ) : filteredDiscounts.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-10 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">لا توجد خصومات</h3>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">لم يتم العثور على أي خصومات. أضف خصمك الأول للبدء.</p>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {searchTerm || typeFilter || activeOnly
+              ? 'لا توجد خصومات تطابق معايير البحث'
+              : 'لم يتم العثور على أي خصومات. أضف خصم جديد للبدء.'
+            }
+          </p>
+          {(searchTerm || typeFilter || activeOnly) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setTypeFilter('');
+                setActiveOnly(false);
+              }}
+              className="mt-4 inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              إزالة عوامل التصفية
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {discounts.map(discount => (
-            <DiscountCard key={discount.id} discount={discount} />
-          ))}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 px-2">
+            <div>عرض {filteredDiscounts.length} من أصل {discounts.length} خصم</div>
+          </div>
+          <DiscountTable
+            discounts={filteredDiscounts}
+            onEdit={handleEditDiscount}
+            onDelete={handleDeleteDiscount}
+          />
         </div>
       )}
       
       {/* Add/Edit discount modal */}
       <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         title={currentDiscount ? 'تعديل الخصم' : 'إضافة خصم جديد'}
-        size="md"
+        size="lg"
       >
-        {error && (
-          <div className="mb-4 p-3 border border-red-300 bg-red-50 dark:bg-red-900 dark:bg-opacity-20 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300 text-sm">
-            <p>{error}</p>
-          </div>
-        )}
-        
-        <form onSubmit={handleSaveDiscount} className="space-y-6">
-          <div>
-            <label htmlFor="discount-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              اسم الخصم <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="discount-name"
-              value={form.name || ''}
-              onChange={(e) => handleChange('name', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="أدخل اسم الخصم"
-              required
-            />
-            {formErrors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{formErrors.name}</p>
-            )}
-          </div>
-          
-          <div>
-            <label htmlFor="discount-percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              نسبة الخصم (%) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="discount-percentage"
-              value={form.percentage || ''}
-              onChange={(e) => handleChange('percentage', parseFloat(e.target.value) || 0)}
-              min={1}
-              max={100}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="أدخل نسبة الخصم"
-              required
-            />
-            {formErrors.percentage && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{formErrors.percentage}</p>
-            )}
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="discount-valid-from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                تاريخ البداية <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="discount-valid-from"
-                value={form.validFrom || ''}
-                onChange={(e) => handleChange('validFrom', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
-              />
-              {formErrors.validFrom && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{formErrors.validFrom}</p>
-              )}
-            </div>
-            
-            <div>
-              <label htmlFor="discount-valid-to" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                تاريخ النهاية <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="discount-valid-to"
-                value={form.validTo || ''}
-                onChange={(e) => handleChange('validTo', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
-              />
-              {formErrors.validTo && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{formErrors.validTo}</p>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              type="button"
-              variant="secondary" 
-              onClick={() => setIsAddModalOpen(false)}
-              disabled={isSubmitting}
-            >
-              إلغاء
-            </Button>
-            <Button 
-              type="submit" 
-              variant="primary" 
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'جاري الحفظ...' : currentDiscount?.id ? 'تحديث الخصم' : 'إضافة الخصم'}
-            </Button>
-          </div>
-        </form>
+        <DiscountForm 
+          discount={currentDiscount || undefined}
+          onSubmit={handleSaveDiscount}
+          isSubmitting={isSubmitting}
+        />
       </Modal>
       
       {/* Delete confirmation modal */}
-      {currentDiscount && (
-        <Modal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          title="تأكيد الحذف"
-          size="sm"
-          footer={
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => setIsDeleteModalOpen(false)}
-                disabled={isDeleting}
-              >
-                إلغاء
-              </Button>
-              <Button
-                variant="primary"
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'جاري الحذف...' : 'تأكيد الحذف'}
-              </Button>
-            </>
-          }
-        >
-          <div className="text-center py-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-              هل أنت متأكد من حذف هذا الخصم؟
-            </h3>
-            <p className="mt-2 text-gray-500 dark:text-gray-400">
-              سيتم حذف الخصم <span className="font-semibold text-gray-700 dark:text-gray-300">{currentDiscount.name}</span> نهائيًا.
-              <br />
-              هذا الإجراء لا يمكن التراجع عنه.
-            </p>
-          </div>
-        </Modal>
-      )}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="تأكيد حذف الخصم"
+        entityName={currentDiscount?.name || 'الخصم'}
+        isDeleting={isDeleting}
+      />
+    </div>
     </div>
   );
 }

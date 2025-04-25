@@ -26,8 +26,11 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, loading = false }) =>
   };
 
   // تنسيق التاريخ
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('ar-SA', {
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) return '-';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString('ar-SA', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

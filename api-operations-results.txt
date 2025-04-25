@@ -1,0 +1,432 @@
+🚀 Starting API operations test...
+
+📅 4/25/2025, 5:16:24 PM
+
+=== Environment ===
+API URL: https://omnimart-api.onrender.com
+--------------------------------------------------
+
+=== TESTING CATEGORIES API ===
+📋 Fetching all categories...
+✅ Fetched 4 categories.
+Sample: [
+  {
+    "_id": "6808f7dcc77be29937a03db3",
+    "name": "ملابس نسائية",
+    "description": "أحدث صيحات الموضة النسائية",
+    "slug": "womens-clothing",
+    "parentId": null,
+    "isActive": true,
+    "createdAt": "2025-04-23T14:23:24.823Z",
+    "updatedAt": "2025-04-23T14:23:24.823Z",
+    "__v": 0,
+    "id": "6808f7dcc77be29937a03db3"
+  },
+  {
+    "_id": "6808f7dcc77be29937a03db2",
+    "name": "ملابس رجالية",
+    "description": "كل ما يتعلق بالأزياء الرجالية",
+    "slug": "mens-clothing",
+    "parentId": null,
+    "isActive": true,
+    "createdAt": "2025-04-23T14:23:24.823Z",
+    "updatedAt": "2025-04-23T14:23:24.823Z",
+    "__v": 0,
+    "id": "6808f7dcc77be29937a03db2"
+  }
+]
+
+📋 Fetching category by ID (6808f7dcc77be29937a03db3)...
+✅ Category details: {
+  "_id": "6808f7dcc77be29937a03db3",
+  "name": "ملابس نسائية",
+  "description": "أحدث صيحات الموضة النسائية",
+  "slug": "womens-clothing",
+  "parentId": null,
+  "isActive": true,
+  "createdAt": "2025-04-23T14:23:24.823Z",
+  "updatedAt": "2025-04-23T14:23:24.823Z",
+  "__v": 0,
+  "id": "6808f7dcc77be29937a03db3"
+}
+
+📋 Creating a new category...
+✅ Created category: {
+  "name": "Test Category 1745597785975",
+  "description": "Created by API test script",
+  "_id": "680bb55aa1f418bdb2013c15",
+  "__v": 0,
+  "id": "680bb55aa1f418bdb2013c15"
+}
+
+📋 Updating category 680bb55aa1f418bdb2013c15...
+✅ Updated category: {
+  "_id": "680bb55aa1f418bdb2013c15",
+  "name": "Test Category 1745597785975",
+  "description": "Updated by API test script at 4/25/2025, 5:16:26 PM",
+  "__v": 0,
+  "id": "680bb55aa1f418bdb2013c15"
+}
+
+📋 Deleting category 680bb55aa1f418bdb2013c15...
+✅ Category deleted successfully.
+
+--------------------------------------------------
+
+=== TESTING PRODUCTS API ===
+📋 Fetching products with various options...
+
+📋 All products:
+✅ Fetched 4 products.
+Sample products: [
+  {
+    "_id": "6808f7ddc77be29937a03dbd",
+    "name": "فستان أنيق",
+    "description": "فستان نسائي أنيق مناسب للمناسبات",
+    "price": 4500,
+    "oldPrice": 5000,
+    "categoryId": "6808f7dcc77be29937a03db3",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "تصميم عصري",
+      "قماش مريح"
+    ],
+    "material": "حرير وقطن",
+    "care": "تنظيف جاف فقط",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أحمر",
+        "value": "#FF0000"
+      },
+      {
+        "name": "أسود",
+        "value": "#000000"
+      }
+    ],
+    "isNewProduct": false,
+    "rating": 5,
+    "reviews": 8,
+    "discountId": "6808f7dcc77be29937a03db8",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:25:09.254Z",
+    "__v": 0,
+    "stock": 0,
+    "id": "6808f7ddc77be29937a03dbd"
+  },
+  {
+    "_id": "6808f7ddc77be29937a03dbe",
+    "name": "حقيبة يد نسائية",
+    "description": "حقيبة يد عصرية وأنيقة",
+    "price": 3500,
+    "categoryId": "6808f7dcc77be29937a03db4",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "سعة كبيرة",
+      "متينة وعملية"
+    ],
+    "material": "جلد صناعي",
+    "care": "تنظيف بقطعة قماش مبللة",
+    "sizes": [
+      "واحد"
+    ],
+    "colors": [
+      {
+        "name": "بني",
+        "value": "#8B4513"
+      }
+    ],
+    "isNewProduct": true,
+    "rating": 4,
+    "reviews": 5,
+    "discountId": "6808f7dcc77be29937a03db9",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:58:15.507Z",
+    "__v": 0,
+    "stock": 0,
+    "id": "6808f7ddc77be29937a03dbe"
+  }
+]
+
+📋 Products by category:
+✅ Fetched 4 products in category 6808f7dcc77be29937a03db3.
+Sample products by category: [
+  {
+    "_id": "6808f7ddc77be29937a03dbd",
+    "name": "فستان أنيق",
+    "description": "فستان نسائي أنيق مناسب للمناسبات",
+    "price": 4500,
+    "oldPrice": 5000,
+    "categoryId": "6808f7dcc77be29937a03db3",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "تصميم عصري",
+      "قماش مريح"
+    ],
+    "material": "حرير وقطن",
+    "care": "تنظيف جاف فقط",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أحمر",
+        "value": "#FF0000"
+      },
+      {
+        "name": "أسود",
+        "value": "#000000"
+      }
+    ],
+    "isNewProduct": false,
+    "rating": 5,
+    "reviews": 8,
+    "discountId": "6808f7dcc77be29937a03db8",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:25:09.254Z",
+    "__v": 0,
+    "stock": 0,
+    "id": "6808f7ddc77be29937a03dbd"
+  }
+]
+
+📋 New products:
+✅ Fetched 4 new products.
+Sample new products: [
+  {
+    "_id": "6808f7ddc77be29937a03dbd",
+    "name": "فستان أنيق",
+    "description": "فستان نسائي أنيق مناسب للمناسبات",
+    "price": 4500,
+    "oldPrice": 5000,
+    "categoryId": "6808f7dcc77be29937a03db3",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "تصميم عصري",
+      "قماش مريح"
+    ],
+    "material": "حرير وقطن",
+    "care": "تنظيف جاف فقط",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أحمر",
+        "value": "#FF0000"
+      },
+      {
+        "name": "أسود",
+        "value": "#000000"
+      }
+    ],
+    "isNewProduct": false,
+    "rating": 5,
+    "reviews": 8,
+    "discountId": "6808f7dcc77be29937a03db8",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:25:09.254Z",
+    "__v": 0,
+    "stock": 0,
+    "id": "6808f7ddc77be29937a03dbd"
+  }
+]
+
+📋 Products with discounts:
+✅ Fetched 4 discounted products.
+Sample discounted products: [
+  {
+    "_id": "6808f7ddc77be29937a03dbd",
+    "name": "فستان أنيق",
+    "description": "فستان نسائي أنيق مناسب للمناسبات",
+    "price": 4500,
+    "oldPrice": 5000,
+    "categoryId": "6808f7dcc77be29937a03db3",
+    "images": [
+      "https://via.placeholder.com/400x500"
+    ],
+    "features": [
+      "تصميم عصري",
+      "قماش مريح"
+    ],
+    "material": "حرير وقطن",
+    "care": "تنظيف جاف فقط",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      {
+        "name": "أحمر",
+        "value": "#FF0000"
+      },
+      {
+        "name": "أسود",
+        "value": "#000000"
+      }
+    ],
+    "isNewProduct": false,
+    "rating": 5,
+    "reviews": 8,
+    "discountId": "6808f7dcc77be29937a03db8",
+    "createdAt": "2025-04-23T14:23:25.022Z",
+    "updatedAt": "2025-04-25T14:25:09.254Z",
+    "__v": 0,
+    "stock": 0,
+    "id": "6808f7ddc77be29937a03dbd"
+  }
+]
+
+📋 Creating a new product...
+❌ Error creating product: {"message":"خطأ في البيانات المدخلة"}
+Backend response: {
+  "message": "خطأ في البيانات المدخلة"
+}
+
+--------------------------------------------------
+
+=== TESTING DISCOUNTS API ===
+📋 Fetching all discounts...
+✅ Fetched 3 discounts.
+Sample: [
+  {
+    "_id": "68068a008d4bc68932f66dec",
+    "name": "خصم اول زيارة للموقع",
+    "percentage": 20,
+    "validFrom": "2025-04-21T00:00:00.000Z",
+    "validTo": "2025-05-21T00:00:00.000Z",
+    "type": "sale",
+    "applicableProducts": [],
+    "applicableCategories": [],
+    "isActive": true,
+    "createdAt": "2025-04-21T18:10:08.315Z",
+    "updatedAt": "2025-04-22T01:59:04.326Z",
+    "__v": 0,
+    "id": "68068a008d4bc68932f66dec"
+  },
+  {
+    "_id": "6808f7dcc77be29937a03db8",
+    "name": "خصم الصيف",
+    "percentage": 15,
+    "validFrom": "2025-04-23T14:23:24.921Z",
+    "validTo": "2025-05-23T14:23:24.921Z",
+    "type": "seasonal",
+    "applicableProducts": [],
+    "applicableCategories": [],
+    "isActive": true,
+    "createdAt": "2025-04-23T14:23:24.923Z",
+    "updatedAt": "2025-04-23T14:23:24.923Z",
+    "__v": 0,
+    "id": "6808f7dcc77be29937a03db8"
+  }
+]
+
+📋 Creating a new discount...
+❌ Error creating discount: {"message":"خطأ في البيانات المدخلة"}
+Backend response: {
+  "message": "خطأ في البيانات المدخلة"
+}
+
+--------------------------------------------------
+
+=== TESTING ORDERS API ===
+📋 Fetching all orders...
+✅ Fetched 0 orders.
+
+📋 Fetching pending orders...
+✅ Fetched 0 pending orders.
+
+📋 Creating a new order...
+✅ Created order: {
+  "customerName": "Test Customer",
+  "customerPhone": "0123456789",
+  "customerAddress": "Test Address, Test City",
+  "wilaya": "Test Wilaya",
+  "products": [
+    {
+      "productId": "6808f7ddc77be29937a03dbd",
+      "productName": "فستان أنيق",
+      "price": 4500,
+      "quantity": 1,
+      "size": "S",
+      "color": "أحمر",
+      "_id": "680bb55ea1f418bdb2013c23"
+    }
+  ],
+  "totalAmount": 4500,
+  "shippingCost": 500,
+  "status": "pending",
+  "notes": "Test order created by API test script",
+  "_id": "680bb55ea1f418bdb2013c22",
+  "createdAt": "2025-04-25T16:16:30.857Z",
+  "updatedAt": "2025-04-25T16:16:30.857Z",
+  "__v": 0,
+  "id": "680bb55ea1f418bdb2013c22"
+}
+
+📋 Fetching order by ID (680bb55ea1f418bdb2013c22)...
+✅ Order details: null
+
+📋 Updating order status to 'processing'...
+✅ Updated order status: {
+  "_id": "680bb55ea1f418bdb2013c22",
+  "customerName": "Test Customer",
+  "customerPhone": "0123456789",
+  "customerAddress": "Test Address, Test City",
+  "wilaya": "Test Wilaya",
+  "products": [
+    {
+      "productId": "6808f7ddc77be29937a03dbd",
+      "productName": "فستان أنيق",
+      "price": 4500,
+      "quantity": 1,
+      "size": "S",
+      "color": "أحمر",
+      "_id": "680bb55ea1f418bdb2013c23"
+    }
+  ],
+  "totalAmount": 4500,
+  "shippingCost": 500,
+  "status": "processing",
+  "notes": "Test order created by API test script",
+  "createdAt": "2025-04-25T16:16:30.857Z",
+  "updatedAt": "2025-04-25T16:16:31.583Z",
+  "__v": 0,
+  "id": "680bb55ea1f418bdb2013c22"
+}
+
+📋 Deleting order 680bb55ea1f418bdb2013c22...
+✅ Order deleted successfully.
+
+--------------------------------------------------
+
+=== TESTING STATISTICS API ===
+📋 Fetching statistics...
+✅ Statistics: {}
+
+📋 Testing system initialization...
+❌ Error initializing system: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /api/initialize</pre>\n</body>\n</html>\n"
+
+📋 Testing cache clearing...
+✅ Caches cleared successfully.
+
+--------------------------------------------------
+
+🏁 API operations test completed successfully!

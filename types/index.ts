@@ -1,131 +1,106 @@
 // واجهات البيانات الخاصة بالـ Products، Orders، Categories، Discounts
 
 export interface Product {
-    id: string;                  // معرّف المنتج
-    name: string;                // اسم المنتج
-    description: string;         // وصف المنتج
-    price: number;               // السعر
-    oldPrice?: number;           // السعر القديم قبل التخفيض (اختياري)
-    categoryId: string;          // فئة المنتج
-    category?: string;           // اسم الفئة للعرض
-    images: string[];            // صور المنتج
-    image?: string;              // الصورة الرئيسية للمنتج (للتوافق مع الكود القديم)
-    features: string[];          // ميزات المنتج
-    material: string;            // المواد المصنوع منها المنتج
-    care: string;                // تعليمات العناية بالمنتج
-    sizes: string[];             // المقاسات المتوفرة
-    colors?: { name: string; value: string }[]; // الألوان المتوفرة
-    isNew?: boolean;             // ما إذا كان المنتج جديد
-    discount?: number | {        // نسبة التخفيض أو كائن تفاصيل التخفيض
-      percentage: number;
-      startDate: string;
-      endDate: string;
-      type: 'sale' | 'special';
-    };
-    rating: number;              // تقييم المنتج
-    reviews: number;             // عدد المراجعات
-    createdAt: Date;             // تاريخ إضافة المنتج
-    updatedAt: Date;             // تاريخ آخر تعديل
-    discountId?: string;         // معرّف التخفيض (إن وُجد)
+  _id?: string;
+  id?: string;
+  name: string;
+  description?: string;
+  price: number;
+  oldPrice?: number;
+  category?: Category | string;
+  categoryId?: string;
+  stock?: number;
+  images?: string[];
+  features?: string[];
+  material?: string;
+  care?: string;
+  sizes?: string[];
+  colors?: { name: string; value: string }[];
+  isNewProduct?: boolean;
+  discountId?: string | null;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
-  
+
+export interface OrderProductItem {
+  _id?: string;
+  product: string | Product | null; // always required, backend uses ObjectId
+  productName: string;
+  price: number;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
 export interface Order {
-    id: string;                  // معرّف الطلب
-    customerName: string;        // اسم العميل
-    customerPhone: string;       // رقم الهاتف
-    customerAddress: string;     // عنوان العميل
-    wilaya: string;              // الولاية
-    products: Array<{
-      productId: string;
-      productName: string;       // اسم المنتج
-      price: number;             // سعر المنتج
-      quantity: number;          // الكمية
-      size?: string;             // المقاس (اختياري)
-      color?: string;            // اللون (اختياري)
-    }>;
-    totalAmount: number;         // المبلغ الإجمالي للطلب
-    shippingCost: number;        // تكلفة الشحن
-    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'; // حالة الطلب بمزيد من التفاصيل
-    notes?: string;              // ملاحظات إضافية
-    createdAt: Date;             // تاريخ إنشاء الطلب
-    updatedAt?: Date;            // تاريخ آخر تحديث للطلب
+  customerAddress: string;
+  paymentMethod: any;
+  _id?: string;
+  id?: string;
+  customerName: string;
+  customerPhone: string;
+  wilaya: string;
+  baladia: string; // required
+  products: OrderProductItem[];
+  totalAmount: number;
+  shippingCost: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
-  
+
 export interface Category {
-    id: string;                  // معرّف الفئة
-    name: string;                // اسم الفئة
-    description?: string;        // وصف الفئة (اختياري)
-    slug?: string;               // اسم URL المختصر للفئة
-    image?: string;              // صورة الفئة
-    parentId?: string;           // معرّف الفئة الأم (للفئات الفرعية)
-    isActive?: boolean;          // ما إذا كانت الفئة نشطة
+  _id?: string;
+  id?: string;
+  name: string;
+  description?: string;
+  image?: string;
+  imageUrl?: string;
+  parentId?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
-  
+
 export interface Discount {
-    id: string;                  // معرّف التخفيض
-    name: string;                // اسم التخفيض
-    percentage: number;          // نسبة التخفيض
-    validFrom: Date;             // بداية صلاحية التخفيض
-    validTo: Date;               // نهاية صلاحية التخفيض
-    type?: 'sale' | 'special' | 'seasonal'; // نوع التخفيض
-    applicableProducts?: string[]; // معرّفات المنتجات المطبق عليها التخفيض
-    applicableCategories?: string[]; // معرّفات الفئات المطبق عليها التخفيض
-    minPurchase?: number;        // الحد الأدنى للشراء لتطبيق التخفيض
-    code?: string;               // رمز التخفيض (للخصومات بالرمز)
-    isActive?: boolean;          // ما إذا كان التخفيض نشط
+  _id?: string;
+  id?: string;
+  code: string;
+  percentage: number;
+  expiresAt: string;
+  name?: string;
+  validFrom?: string;
+  validTo?: string;
+  type?: 'sale' | 'seasonal' | 'special' | 'coupon';
+  applicableProducts?: string[];
+  applicableCategories?: string[];
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
-// واجهات للإحصاءات
-export interface Statistics {
-    totalSales: number;          // إجمالي المبيعات
-    totalOrders: number;         // إجمالي الطلبات
-    totalCustomers: number;      // إجمالي العملاء
-    topSellingProducts: TopSellingProduct[]; // المنتجات الأكثر مبيعاً
-    recentOrders: Order[];       // الطلبات الأخيرة
-    salesByDate: SalesByDate[];  // المبيعات حسب التاريخ
-}
 
-export interface TopSellingProduct {
-    productId: string;           // معرّف المنتج
-    productName: string;         // اسم المنتج
-    unitsSold: number;           // عدد الوحدات المباعة
-    totalRevenue: number;        // إجمالي الإيرادات
-}
 
 export interface SalesByDate {
-    date: string;                // التاريخ
-    amount: number;              // المبلغ
+  date: string;
+  amount: number;
 }
 
-// واجهة المستخدم (للمسؤولين)
-export interface User {
-    id: string;                  // معرّف المستخدم
-    username: string;            // اسم المستخدم
-    email: string;               // البريد الإلكتروني
-    password: string;            // كلمة المرور (مشفرة)
-    role: 'admin' | 'editor' | 'viewer'; // دور المستخدم
-    createdAt: Date;             // تاريخ إنشاء الحساب
-    lastLogin?: Date;            // تاريخ آخر تسجيل دخول
-}
+// (your existing types file content)
 
-// إعدادات المتجر
-export interface StoreSettings {
-    storeName: string;           // اسم المتجر
-    logo: string;                // شعار المتجر
-    contactPhone: string;        // رقم الهاتف للتواصل
-    contactEmail: string;        // البريد الإلكتروني للتواصل
-    address: string;             // عنوان المتجر
-    socialMedia: {               // روابط وسائل التواصل الاجتماعي
-        facebook?: string;
-        instagram?: string;
-        twitter?: string;
-    };
-    shippingRates: ShippingRate[]; // أسعار الشحن حسب المنطقة
-    workingHours: string;        // ساعات العمل
-}
-
-export interface ShippingRate {
-    region: string;              // المنطقة
-    cost: number;                // تكلفة الشحن
-    estimatedDays: string;       // المدة المتوقعة للتوصيل
+export interface TopSellingProduct {
+  productId: string;
+  productName?: string;
+  imageUrl?: string;
+  category?: string;
+  unitsSold?: number;
+  totalRevenue?: number;
+  unitPrice?: number;
+  inStock?: number;
 }

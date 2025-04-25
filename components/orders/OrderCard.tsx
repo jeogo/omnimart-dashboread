@@ -58,8 +58,10 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange, onViewDeta
   };
 
   // تنسيق التاريخ
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ar-DZ', {
+  const formatDate = (date: string | Date | undefined) => {
+    if (!date) return '';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('ar-DZ', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -72,7 +74,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange, onViewDeta
   // معالجة تغيير الحالة
   const handleStatusChange = () => {
     if (selectedStatus !== order.status) {
-      onStatusChange(order.id, selectedStatus);
+      if (order.id) {
+        onStatusChange(order.id, selectedStatus);
+      }
       setIsChangingStatus(false);
     }
   };
@@ -130,7 +134,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange, onViewDeta
       {/* تذييل البطاقة */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
         <button 
-          onClick={() => onViewDetails(order.id)}
+          onClick={() => { if (order.id) onViewDetails(order.id); }}
           className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900 dark:hover:bg-opacity-20 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
         >
           عرض التفاصيل

@@ -48,7 +48,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onStatusChange }) =>
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">معلومات الطلب</h3>
           <div className="space-y-2">
             <p className="text-base text-gray-800 dark:text-white"><span className="font-medium">رقم الطلب:</span> #{order.id}</p>
-            <p className="text-base text-gray-800 dark:text-white"><span className="font-medium">تاريخ الطلب:</span> {formatDate(order.createdAt)}</p>
+            <p className="text-base text-gray-800 dark:text-white"><span className="font-medium">تاريخ الطلب:</span> {formatDate(order.createdAt ?? '')}</p>
             <p className="text-base text-gray-800 dark:text-white"><span className="font-medium">المجموع:</span> {order.totalAmount.toLocaleString('ar-DZ')} د.ج</p>
             <div className="flex items-center gap-2">
               <span className="font-medium text-base text-gray-800 dark:text-white">الحالة:</span>
