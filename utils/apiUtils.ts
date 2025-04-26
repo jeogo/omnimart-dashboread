@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Product, Category, Discount, Order } from '@/types';
 
-const API_URL = 'https://omnimart-api.onrender.com/api';
+const API_URL = 'https://omnimart-api-m15a.onrender.com/api';
 
 // --- Product helpers ---
 const transformProduct = (doc: any): Product => {
